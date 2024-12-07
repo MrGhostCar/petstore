@@ -1,27 +1,29 @@
 package com.home.petstore.order;
 
+import jakarta.websocket.server.PathParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController("/store")
+@RestController
+@RequestMapping("/store/order")
 public class OrderController {
 
-    @Autowired
-    OrderService orderService;
+  @Autowired OrderService orderService;
 
-    @PostMapping("/order")
-    public void createOrder (@RequestBody OrderDTO orderDAO) {
-        orderService.createOrder(orderDAO);
-    }
+  @PostMapping
+  public void createOrder(@RequestBody OrderDTO orderDTO) {
+    orderService.createOrder(orderDTO);
+  }
 
-    @GetMapping("/order")
-    public List<OrderDTO> getOrders() {
-        return orderService.getAll();
-    }
+  @GetMapping
+  public List<OrderDTO> getOrders() { // TODO
+    return orderService.getAll();
+  }
 
+  @GetMapping("/{orderId}")
+  public OrderDTO getOrder(@PathVariable Long orderId) {
+    return orderService.getOne(orderId);
+  }
 }
