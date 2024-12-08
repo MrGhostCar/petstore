@@ -7,13 +7,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.util.MultiValueMap;
-
-import java.time.LocalDateTime;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -80,19 +76,47 @@ public class OrderRequestTests extends JsonTestConfig {
 
   @Test
   public void whenGetMadeForOne_thenReturnJson() throws Exception {
-    MvcResult result = this.mockMvc
-        .perform(post("/store/order").contentType(APPLICATION_JSON).content(testOrder2))
+    MvcResult result =
+        this.mockMvc
+            .perform(post("/store/order").contentType(APPLICATION_JSON).content(testOrder2))
+            .andDo(print())
+            .andExpect(status().isOk())
+            .andReturn();
+
+    String json = result.getResponse().getContentAsString();
+    OrderDTO returnedOrderFromPost = mapper.readValue(json, OrderDTO.class);
+
+    mockMvc
+        .perform(
+            get("/store/order/{id}", returnedOrderFromPost.getId()).contentType(APPLICATION_JSON))
         .andDo(print())
         .andExpect(status().isOk())
+        .andExpect(jsonPath("$.id").value(returnedOrderFromPost.getId()));
+  }
+
+  @Test
+  public void givenThereIsAnOrder_whenDeleteCalled_thenSameOrderNotFound() throws Exception {
+    MvcResult result =
+        this.mockMvc
+            .perform(post("/store/order").contentType(APPLICATION_JSON).content(testOrder2))
+            .andDo(print())
+            .andExpect(status().isOk())
             .andReturn();
 
     String json = result.getResponse().getContentAsString();
     OrderDTO returnedOrder = mapper.readValue(json, OrderDTO.class);
 
     mockMvc
-        .perform(get("/store/order/{id}", returnedOrder.getId()).contentType(APPLICATION_JSON))
+        .perform(delete("/store/order/{id}", returnedOrder.getId()).contentType(APPLICATION_JSON))
         .andDo(print())
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.id").exists());
+        .andExpect(status().isOk());
+
+    mockMvc
+            .perform(get("/store/order/{id}", returnedOrder.getId()).contentType(APPLICATION_JSON))
+            .andDo(print())
+            .andExpect(status().isNotFound());
+
+
+
   }
 }

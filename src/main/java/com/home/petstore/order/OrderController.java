@@ -1,7 +1,10 @@
 package com.home.petstore.order;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -26,8 +29,12 @@ public class OrderController {
   }
 
   @GetMapping("/{orderId}")
-  public OrderDTO getOrder(@PathVariable Long orderId) {
-    return orderService.getOne(orderId);
+  public ResponseEntity<OrderDTO> getOrder(@PathVariable Long orderId) {
+    try {
+      return new ResponseEntity<>(orderService.getOne(orderId), HttpStatus.OK);
+    } catch (EntityNotFoundException e) {
+      return new ResponseEntity<OrderDTO>(HttpStatus.NOT_FOUND);
+    }
   }
 
   @DeleteMapping("/{orderId}")
