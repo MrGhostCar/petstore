@@ -24,7 +24,7 @@ public class OrderRequestTests extends JsonTestConfig {
   String testOrder1 =
       "{\n"
           + "  \"id\": 0,\n"
-          + "  \"petId\": null,\n"
+          + "  \"petId\": 0,\n"
           + "  \"quantity\": 5,\n"
           + "  \"shipDate\": \"2024-12-07T13:15:53.382Z\",\n"
           + "  \"status\": \"PLACED\",\n"
@@ -34,7 +34,7 @@ public class OrderRequestTests extends JsonTestConfig {
   String testOrder2 =
       "{\n"
           + "  \"id\": 0,\n"
-          + "  \"petId\": null,\n"
+          + "  \"petId\": 0,\n"
           + "  \"quantity\": 5,\n"
           + "  \"shipDate\": \"2024-12-08T13:15:53.382Z\",\n"
           + "  \"status\": \"PLACED\",\n"
@@ -151,4 +151,24 @@ public class OrderRequestTests extends JsonTestConfig {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.quantity").value("11"));
   }
+
+  @Test
+  public void givenThePetIdDoesntExist_whenPostOrderMade_Then422Returned() throws Exception {
+    String testOrder3 =
+            "{\n"
+                    + "  \"id\": 0,\n"
+                    + "  \"petId\": 666,\n"
+                    + "  \"quantity\": 5,\n"
+                    + "  \"shipDate\": \"2024-12-08T13:15:53.382Z\",\n"
+                    + "  \"status\": \"PLACED\",\n"
+                    + "  \"complete\": false\n"
+                    + "}";
+
+    mockMvc
+            .perform(post("/store/order").contentType(APPLICATION_JSON).content(testOrder3))
+            .andDo(print())
+            .andExpect(status().isUnprocessableEntity());
+  }
+
+
 }
