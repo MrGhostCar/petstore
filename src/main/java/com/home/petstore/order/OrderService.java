@@ -5,6 +5,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -14,12 +15,13 @@ public class OrderService {
 
   public void createOrder(OrderDTO orderDAO) {
     OrderEntity orderEntity = modelMapper.map(orderDAO, OrderEntity.class);
+    orderEntity.setId(null);
     orderRepository.save(orderEntity);
   }
 
-  public List<OrderDTO> getAll() {
-    List<OrderEntity> orders = orderRepository.findAll();
-    return modelMapper.mapList(orders, OrderDTO.class);
+  public List<OrderDTO> getOrdersFromTo(LocalDateTime from, LocalDateTime to) {
+    List<OrderEntity> foundOrders = orderRepository.findAllByShipDateBetween(from, to);
+    return modelMapper.mapList(foundOrders, OrderDTO.class);
   }
 
   public OrderDTO getOne(Long orderId) {
@@ -30,4 +32,8 @@ public class OrderService {
 
     return modelMapper.map(foundEntity, OrderDTO.class);
   }
+
+    public void deleteOne(Long orderId) {
+        orderRepository.deleteById(orderId);
+    }
 }

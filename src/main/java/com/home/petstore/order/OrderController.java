@@ -1,9 +1,10 @@
 package com.home.petstore.order;
 
-import jakarta.websocket.server.PathParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -18,12 +19,19 @@ public class OrderController {
   }
 
   @GetMapping
-  public List<OrderDTO> getOrders() { // TODO
-    return orderService.getAll();
+  public List<OrderDTO> getOrders(
+      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime from,
+      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime to) {
+    return orderService.getOrdersFromTo(from, to);
   }
 
   @GetMapping("/{orderId}")
   public OrderDTO getOrder(@PathVariable Long orderId) {
     return orderService.getOne(orderId);
+  }
+
+  @DeleteMapping("/{orderId}")
+  public void deleteOrder(@PathVariable Long orderId) {
+    orderService.deleteOne(orderId);
   }
 }
