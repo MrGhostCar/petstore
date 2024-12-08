@@ -13,10 +13,11 @@ public class OrderService {
   @Autowired OrderRepository orderRepository;
   @Autowired ExtendedModelMapper modelMapper;
 
-  public void createOrder(OrderDTO orderDAO) {
-    OrderEntity orderEntity = modelMapper.map(orderDAO, OrderEntity.class);
+  public OrderDTO createOrder(OrderDTO orderDTO) {
+    OrderEntity orderEntity = modelMapper.map(orderDTO, OrderEntity.class);
     orderEntity.setId(null);
-    orderRepository.save(orderEntity);
+    OrderEntity savedEntity = orderRepository.save(orderEntity);
+      return modelMapper.map(savedEntity, OrderDTO.class);
   }
 
   public List<OrderDTO> getOrdersFromTo(LocalDateTime from, LocalDateTime to) {

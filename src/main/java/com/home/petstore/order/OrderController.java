@@ -14,8 +14,8 @@ public class OrderController {
   @Autowired OrderService orderService;
 
   @PostMapping
-  public void createOrder(@RequestBody OrderDTO orderDTO) {
-    orderService.createOrder(orderDTO);
+  public OrderDTO createOrder(@RequestBody OrderDTO orderDTO) {
+    return orderService.createOrder(orderDTO);
   }
 
   @GetMapping

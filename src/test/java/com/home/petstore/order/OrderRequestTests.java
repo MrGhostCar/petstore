@@ -6,6 +6,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.MultiValueMap;
 
 import java.time.LocalDateTime;
@@ -53,7 +54,8 @@ public class OrderRequestTests extends JsonTestConfig {
   }
 
   @Test
-  public void givenThereAreTwoOrders_whenSearchParametersGivenForOne_ThenOneReturned() throws Exception {
+  public void givenThereAreTwoOrders_whenSearchParametersGivenForOne_ThenOneReturned()
+      throws Exception {
     mockMvc
         .perform(post("/store/order").contentType(APPLICATION_JSON).content(testOrder1))
         .andDo(print())
@@ -74,5 +76,23 @@ public class OrderRequestTests extends JsonTestConfig {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$[0].id").exists())
         .andExpect(jsonPath("$[0].shipDate").value("2024-12-07T13:15:53.382"));
+  }
+
+  @Test
+  public void whenGetMadeForOne_thenReturnJson() throws Exception {
+    MvcResult result = this.mockMvc
+        .perform(post("/store/order").contentType(APPLICATION_JSON).content(testOrder2))
+        .andDo(print())
+        .andExpect(status().isOk())
+            .andReturn();
+
+    String json = result.getResponse().getContentAsString();
+    OrderDTO returnedOrder = mapper.readValue(json, OrderDTO.class);
+
+    mockMvc
+        .perform(get("/store/order/{id}", returnedOrder.getId()).contentType(APPLICATION_JSON))
+        .andDo(print())
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.id").exists());
   }
 }

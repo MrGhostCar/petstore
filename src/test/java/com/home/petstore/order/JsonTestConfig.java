@@ -13,7 +13,9 @@ public class JsonTestConfig {
     @BeforeAll
     protected static void init() {
         mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
+        mapper.findAndRegisterModules();
         ow = mapper.writer().withDefaultPrettyPrinter();
+
     }
 
     protected static String getJson(Object input) throws JsonProcessingException {
