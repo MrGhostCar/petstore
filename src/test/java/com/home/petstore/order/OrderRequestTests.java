@@ -120,6 +120,13 @@ public class OrderRequestTests extends JsonTestConfig {
   @Test
   public void givenOrderPostMade_whenAPatchCalled_thenModificationIsVisibleOnNextGet()
       throws Exception {
+
+    String patchBody =
+            "[\n" +
+                    "    {\"op\":\"replace\",\"path\":\"/quantity\",\"value\":\"11\"} \n" +
+                    "]";
+
+
     MvcResult result =
         this.mockMvc
             .perform(post("/store/order").contentType(APPLICATION_JSON).content(testOrder2))
@@ -130,23 +137,18 @@ public class OrderRequestTests extends JsonTestConfig {
     String json = result.getResponse().getContentAsString();
     OrderDTO returnedOrder = mapper.readValue(json, OrderDTO.class);
 
-    String patchBody = //TODO
-        "{\n"
-            + "  \"id\": 0,\n"
-            + "  \"petId\": null,\n"
-            + "}";
-
     mockMvc
         .perform(
             patch("/store/order/{id}", returnedOrder.getId())
                 .content(patchBody)
-                .contentType(APPLICATION_JSON))
+                .contentType("application/json-patch+json"))
         .andDo(print())
         .andExpect(status().isOk());
 
     mockMvc
         .perform(get("/store/order/{id}", returnedOrder.getId()).contentType(APPLICATION_JSON))
         .andDo(print())
-        .andExpect(status().isNotFound());
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.quantity").value("11"));
   }
 }
