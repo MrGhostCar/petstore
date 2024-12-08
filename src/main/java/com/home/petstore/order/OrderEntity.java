@@ -12,14 +12,15 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "store_order")
 public class OrderEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
-    @JoinColumn (name = "petId")
+    @JoinColumn (name = "pet_id")
     private PetEntity petId;
 
     private Integer quantity;

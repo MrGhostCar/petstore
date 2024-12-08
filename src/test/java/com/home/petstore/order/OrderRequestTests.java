@@ -153,7 +153,7 @@ public class OrderRequestTests extends JsonTestConfig {
   }
 
   @Test
-  public void givenThePetIdDoesntExist_whenPostOrderMade_Then422Returned() throws Exception {
+  public void givenThePetIdDoesNotExist_whenPostOrderMade_Then422Returned() throws Exception {
     String testOrder3 =
             "{\n"
                     + "  \"id\": 0,\n"

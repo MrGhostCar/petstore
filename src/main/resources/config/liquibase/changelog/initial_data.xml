@@ -1,0 +1,12 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet author="user" id="insert-example-1">
+        <insert tableName="pet">
+            <column name="id" value="0"/>
+            <column name="name" value="Hamster"/>
+            <column name="status" value="null"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>
