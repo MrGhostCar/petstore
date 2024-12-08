@@ -112,11 +112,41 @@ public class OrderRequestTests extends JsonTestConfig {
         .andExpect(status().isOk());
 
     mockMvc
-            .perform(get("/store/order/{id}", returnedOrder.getId()).contentType(APPLICATION_JSON))
+        .perform(get("/store/order/{id}", returnedOrder.getId()).contentType(APPLICATION_JSON))
+        .andDo(print())
+        .andExpect(status().isNotFound());
+  }
+
+  @Test
+  public void givenOrderPostMade_whenAPatchCalled_thenModificationIsVisibleOnNextGet()
+      throws Exception {
+    MvcResult result =
+        this.mockMvc
+            .perform(post("/store/order").contentType(APPLICATION_JSON).content(testOrder2))
             .andDo(print())
-            .andExpect(status().isNotFound());
+            .andExpect(status().isOk())
+            .andReturn();
 
+    String json = result.getResponse().getContentAsString();
+    OrderDTO returnedOrder = mapper.readValue(json, OrderDTO.class);
 
+    String patchBody = //TODO
+        "{\n"
+            + "  \"id\": 0,\n"
+            + "  \"petId\": null,\n"
+            + "}";
 
+    mockMvc
+        .perform(
+            patch("/store/order/{id}", returnedOrder.getId())
+                .content(patchBody)
+                .contentType(APPLICATION_JSON))
+        .andDo(print())
+        .andExpect(status().isOk());
+
+    mockMvc
+        .perform(get("/store/order/{id}", returnedOrder.getId()).contentType(APPLICATION_JSON))
+        .andDo(print())
+        .andExpect(status().isNotFound());
   }
 }
