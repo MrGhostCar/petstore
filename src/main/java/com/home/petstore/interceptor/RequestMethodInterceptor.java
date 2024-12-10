@@ -11,23 +11,29 @@ import org.springframework.web.servlet.HandlerInterceptor;
 public class RequestMethodInterceptor implements HandlerInterceptor {
 
     @Value("${x-api-key}")
-    private String bar;
+    private String environmentLoadedApiKey;
 
     @Override
     public boolean preHandle(HttpServletRequest request,
                              HttpServletResponse response, Object handler) throws Exception {
         //Get the 'Accept' header value
-        String headerValue = request.getHeader("x-api-key");
+        String headerValue = request.getHeader("X-Api-Key");
+
+        //We allow CORS checks from browsers
+        if ("OPTIONS".equals(request.getMethod())) {
+            return true;
+        }
 
         if (headerValue == null)
             throw new ApiKeyException("Api key missing.");
 
         //check the request contains expected header value
-        if(!headerValue.equals(bar)) {
+        if(!headerValue.equals(environmentLoadedApiKey)) {
             //Reject and Log or Ignore upon your requirement & return false
-            return false;
+            throw new ApiKeyException("Api key invalid.");
         } else {
             return true;
         }
     }
+
 }
