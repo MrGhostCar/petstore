@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  front-end:
+    image: d1324ebfd3f6
+    ports:
+      - 3000:3000
+  back-end:
+    image: home/petstore-be:3
+    environment:
+      x-api-key: xxxx
+      search-interval-max: 5
+    ports:
+      - 8080:8080

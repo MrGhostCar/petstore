@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
 import com.home.petstore.exception.PetNotFoundException;
+import com.home.petstore.exception.TimeIntervalExceededException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -31,10 +32,15 @@ public class OrderController {
   }
 
   @GetMapping
-  public List<OrderDTO> getOrders(
+  public ResponseEntity<List<OrderDTO>> getOrders(
       @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime from,
       @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime to) {
-    return orderService.getOrdersFromTo(from, to);
+    try {
+      List<OrderDTO> searchResult = orderService.getOrdersFromTo(from, to);
+      return new ResponseEntity<>(searchResult, HttpStatus.OK);
+    } catch (TimeIntervalExceededException e) {
+      return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
+    }
   }
 
   @GetMapping("/{orderId}")

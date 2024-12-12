@@ -6,16 +6,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
 import com.home.petstore.exception.PetNotFoundException;
+import com.home.petstore.exception.TimeIntervalExceededException;
 import com.home.petstore.pet.PetEntity;
 import com.home.petstore.pet.PetService;
 import com.home.petstore.util.ExtendedModelMapper;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import static java.time.temporal.ChronoUnit.DAYS;
 
 @Service
 public class OrderService {
@@ -23,6 +27,9 @@ public class OrderService {
   @Autowired ExtendedModelMapper modelMapper;
   @Autowired ObjectMapper mapper;
   @Autowired PetService petService;
+
+  @Value("${search-interval-max}")
+  Long searchIntervalMax;
 
   public OrderDTO createOrder(OrderDTO orderDTO) {
     OrderEntity orderEntity = modelMapper.map(orderDTO, OrderEntity.class);
@@ -41,6 +48,11 @@ public class OrderService {
   }
 
   public List<OrderDTO> getOrdersFromTo(LocalDateTime from, LocalDateTime to) {
+    long dayDiff = DAYS.between(from, to);
+    if (dayDiff > searchIntervalMax)
+      throw new TimeIntervalExceededException(
+          MessageFormat.format(
+              "{0} days exceeds max search interval: {1} ", dayDiff, searchIntervalMax));
     List<OrderEntity> foundOrders = orderRepository.findAllByShipDateBetween(from, to);
     return modelMapper.mapList(foundOrders, OrderDTO.class);
   }
