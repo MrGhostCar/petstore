@@ -79,12 +79,12 @@ public class OrderRequestTests extends JsonTestConfig {
             get("/store/order")
                 .header("x-api-key", "xxxx")
                 .contentType(APPLICATION_JSON)
-                .param("from", "2024-12-01T13:15:53.382Z")
-                .param("to", "2024-12-07T23:59:53.382Z"))
+                .param("from", "2024-12-07T13:15:53.382Z")
+                .param("to", "2024-12-09T23:59:53.382Z"))
         .andDo(print())
         .andExpect(status().isOk())
         .andExpect(jsonPath("$[0].id").exists())
-        .andExpect(jsonPath("$[0].shipDate").value("2024-12-07T13:15:53.382"));
+        .andExpect(jsonPath("$[0].shipDate").value("2024-12-08T13:15:53.382"));
   }
 
   @Test
