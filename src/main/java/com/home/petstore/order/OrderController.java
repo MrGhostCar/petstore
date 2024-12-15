@@ -6,6 +6,7 @@ import com.github.fge.jsonpatch.JsonPatchException;
 import com.home.petstore.exception.PetNotFoundException;
 import com.home.petstore.exception.TimeIntervalExceededException;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -17,6 +18,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/store/order")
+@Slf4j
 public class OrderController {
 
   @Autowired OrderService orderService;
@@ -27,6 +29,7 @@ public class OrderController {
       OrderDTO createdOrder = orderService.createOrder(orderDTO);
       return new ResponseEntity<>(createdOrder, HttpStatus.OK);
     } catch (PetNotFoundException e) {
+      log.error(e.getMessage());
       return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
     }
   }
@@ -39,6 +42,7 @@ public class OrderController {
       List<OrderDTO> searchResult = orderService.getOrdersFromTo(from, to);
       return new ResponseEntity<>(searchResult, HttpStatus.OK);
     } catch (TimeIntervalExceededException e) {
+      log.error(e.getMessage());
       return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
     }
   }
@@ -49,6 +53,7 @@ public class OrderController {
       OrderDTO foundOrder = orderService.getOne(orderId);
       return new ResponseEntity<>(foundOrder, HttpStatus.OK);
     } catch (EntityNotFoundException e) {
+      log.error(e.getMessage());
       return new ResponseEntity<OrderDTO>(HttpStatus.NOT_FOUND);
     }
   }
@@ -67,8 +72,10 @@ public class OrderController {
       OrderDTO newOrder = orderService.saveOrder(patchedOrder);
       return ResponseEntity.ok(newOrder);
     } catch (JsonPatchException | JsonProcessingException e) {
+      log.error(e.getMessage());
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     } catch (PetNotFoundException e) {
+      log.error(e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
   }

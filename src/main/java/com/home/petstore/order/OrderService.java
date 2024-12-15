@@ -7,7 +7,6 @@ import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
 import com.home.petstore.exception.PetNotFoundException;
 import com.home.petstore.exception.TimeIntervalExceededException;
-import com.home.petstore.pet.PetEntity;
 import com.home.petstore.pet.PetService;
 import com.home.petstore.util.ExtendedModelMapper;
 import jakarta.persistence.EntityNotFoundException;
