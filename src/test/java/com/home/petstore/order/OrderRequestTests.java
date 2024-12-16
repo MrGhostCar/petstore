@@ -7,7 +7,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -19,34 +21,39 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class OrderRequestTests extends JsonTestConfig {
 
+  public static final String TEST_API_KEY = "xxxx";
   @Autowired MockMvc mockMvc;
 
   String testOrder1 =
-      "{\n"
-          + "  \"id\": 0,\n"
-          + "  \"petId\": 0,\n"
-          + "  \"quantity\": 5,\n"
-          + "  \"shipDate\": \"2024-12-07T13:15:53.382Z\",\n"
-          + "  \"status\": \"PLACED\",\n"
-          + "  \"complete\": false\n"
-          + "}";
+      """
+         {
+           "id": 0,
+           "petId": 0,
+           "quantity": 5,
+           "shipDate": "2024-12-07T21:12:16.382Z",
+           "status": "PLACED",
+           "complete": false
+         }
+      """;
 
   String testOrder2 =
-      "{\n"
-          + "  \"id\": 0,\n"
-          + "  \"petId\": 0,\n"
-          + "  \"quantity\": 5,\n"
-          + "  \"shipDate\": \"2024-12-08T13:15:53.382Z\",\n"
-          + "  \"status\": \"PLACED\",\n"
-          + "  \"complete\": false\n"
-          + "}";
+      """
+         {
+           "id": 0,
+           "petId": 0,
+           "quantity": 5,
+           "shipDate": "2024-12-08T21:12:16.382Z",
+           "status": "PLACED",
+           "complete": false
+         }
+      """;
 
   @Test
   public void whenCorrectOrderPost_thenReturnOk() throws Exception {
     mockMvc
         .perform(
             post("/store/order")
-                .header("x-api-key", "xxxx")
+                .header("x-api-key", TEST_API_KEY)
                 .contentType(APPLICATION_JSON)
                 .content(testOrder2))
         .andDo(print())
@@ -59,7 +66,7 @@ public class OrderRequestTests extends JsonTestConfig {
     mockMvc
         .perform(
             post("/store/order")
-                .header("x-api-key", "xxxx")
+                .header("x-api-key", TEST_API_KEY)
                 .contentType(APPLICATION_JSON)
                 .content(testOrder1))
         .andDo(print())
@@ -68,7 +75,7 @@ public class OrderRequestTests extends JsonTestConfig {
     mockMvc
         .perform(
             post("/store/order")
-                .header("x-api-key", "xxxx")
+                .header("x-api-key", TEST_API_KEY)
                 .contentType(APPLICATION_JSON)
                 .content(testOrder2))
         .andDo(print())
@@ -77,14 +84,14 @@ public class OrderRequestTests extends JsonTestConfig {
     mockMvc
         .perform(
             get("/store/order")
-                .header("x-api-key", "xxxx")
+                .header("x-api-key", TEST_API_KEY)
                 .contentType(APPLICATION_JSON)
-                .param("from", "2024-12-07T13:15:53.382Z")
-                .param("to", "2024-12-09T23:59:53.382Z"))
+                .param("from", "2024-12-06T13:15:53.382Z")
+                .param("to", "2024-12-07T23:59:53.382Z"))
         .andDo(print())
         .andExpect(status().isOk())
         .andExpect(jsonPath("$[0].id").exists())
-        .andExpect(jsonPath("$[0].shipDate").value("2024-12-08T13:15:53.382"));
+            .andExpect(jsonPath("$", hasSize(1)));
   }
 
   @Test
@@ -93,7 +100,7 @@ public class OrderRequestTests extends JsonTestConfig {
         this.mockMvc
             .perform(
                 post("/store/order")
-                    .header("x-api-key", "xxxx")
+                    .header("x-api-key", TEST_API_KEY)
                     .contentType(APPLICATION_JSON)
                     .content(testOrder2))
             .andDo(print())
@@ -106,7 +113,7 @@ public class OrderRequestTests extends JsonTestConfig {
     mockMvc
         .perform(
             get("/store/order/{id}", returnedOrderFromPost.getId())
-                .header("x-api-key", "xxxx")
+                .header("x-api-key", TEST_API_KEY)
                 .contentType(APPLICATION_JSON))
         .andDo(print())
         .andExpect(status().isOk())
@@ -119,7 +126,7 @@ public class OrderRequestTests extends JsonTestConfig {
         this.mockMvc
             .perform(
                 post("/store/order")
-                    .header("x-api-key", "xxxx")
+                    .header("x-api-key", TEST_API_KEY)
                     .contentType(APPLICATION_JSON)
                     .content(testOrder2))
             .andDo(print())
@@ -132,7 +139,7 @@ public class OrderRequestTests extends JsonTestConfig {
     mockMvc
         .perform(
             delete("/store/order/{id}", returnedOrder.getId())
-                .header("x-api-key", "xxxx")
+                .header("x-api-key", TEST_API_KEY)
                 .contentType(APPLICATION_JSON))
         .andDo(print())
         .andExpect(status().isOk());
@@ -140,7 +147,7 @@ public class OrderRequestTests extends JsonTestConfig {
     mockMvc
         .perform(
             get("/store/order/{id}", returnedOrder.getId())
-                .header("x-api-key", "xxxx")
+                .header("x-api-key", TEST_API_KEY)
                 .contentType(APPLICATION_JSON))
         .andDo(print())
         .andExpect(status().isNotFound());
@@ -151,13 +158,18 @@ public class OrderRequestTests extends JsonTestConfig {
       throws Exception {
 
     String patchBody =
-        "[\n" + "    {\"op\":\"replace\",\"path\":\"/quantity\",\"value\":\"11\"} \n" + "]";
+        """
+      [
+        {"op": "replace", "path": "/quantity", "value": 5},
+        {"op": "replace", "path": "/quantity", "value": 11}
+      ]
+      """;
 
     MvcResult result =
         this.mockMvc
             .perform(
                 post("/store/order")
-                    .header("x-api-key", "xxxx")
+                    .header("x-api-key", TEST_API_KEY)
                     .contentType(APPLICATION_JSON)
                     .content(testOrder2))
             .andDo(print())
@@ -170,7 +182,7 @@ public class OrderRequestTests extends JsonTestConfig {
     mockMvc
         .perform(
             patch("/store/order/{id}", returnedOrder.getId())
-                .header("x-api-key", "xxxx")
+                .header("x-api-key", TEST_API_KEY)
                 .content(patchBody)
                 .contentType("application/json-patch+json"))
         .andDo(print())
@@ -179,7 +191,7 @@ public class OrderRequestTests extends JsonTestConfig {
     mockMvc
         .perform(
             get("/store/order/{id}", returnedOrder.getId())
-                .header("x-api-key", "xxxx")
+                .header("x-api-key", TEST_API_KEY)
                 .contentType(APPLICATION_JSON))
         .andDo(print())
         .andExpect(status().isOk())
@@ -189,17 +201,23 @@ public class OrderRequestTests extends JsonTestConfig {
   @Test
   public void givenThePetIdDoesNotExist_whenPostOrderMade_Then422Returned() throws Exception {
     String testOrder3 =
-        "{\n"
-            + "  \"id\": 0,\n"
-            + "  \"petId\": 666,\n"
-            + "  \"quantity\": 5,\n"
-            + "  \"shipDate\": \"2024-12-08T13:15:53.382Z\",\n"
-            + "  \"status\": \"PLACED\",\n"
-            + "  \"complete\": false\n"
-            + "}";
+        """
+         {
+           "id": 0,
+           "petId": 666,
+           "quantity": 5,
+           "shipDate": "2024-12-08T21:12:16.382Z",
+           "status": "PLACED",
+           "complete": false
+         }
+         """;
 
     mockMvc
-        .perform(post("/store/order").header("x-api-key", "xxxx").contentType(APPLICATION_JSON).content(testOrder3))
+        .perform(
+            post("/store/order")
+                .header("x-api-key", TEST_API_KEY)
+                .contentType(APPLICATION_JSON)
+                .content(testOrder3))
         .andDo(print())
         .andExpect(status().isUnprocessableEntity());
   }

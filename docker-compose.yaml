@@ -1,10 +1,16 @@
 version: '3'
 
 services:
-  front-end:
-    image: d1324ebfd3f6
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: pass123
+      POSTGRES_DB: petstore
     ports:
-      - 3000:3000
+      - 5432:5432
+    networks:
+      - subnet1
   back-end:
     image: home/petstore-be
     environment:
@@ -12,3 +18,8 @@ services:
       search-interval-max: 5
     ports:
       - 8080:8080
+    networks:
+      - subnet1
+
+networks:
+  subnet1:

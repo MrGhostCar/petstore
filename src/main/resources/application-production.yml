@@ -1,0 +1,10 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://db:5432/petstore
+    username: postgres
+    password: pass123
+  liquibase:
+    change-log: classpath:/config/liquibase/master.xml
+  output:
+    ansi:
+      enabled: ALWAYS
