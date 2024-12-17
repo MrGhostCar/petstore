@@ -24,8 +24,12 @@ public class OrderEntity {
     private PetEntity petId;
 
     private Integer quantity;
+
     private LocalDateTime shipDate;
+
+    @Enumerated(EnumType.STRING)
     private OrderStatus status;
+
     private Boolean complete;
 
 }
