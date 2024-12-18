@@ -7,8 +7,6 @@ services:
     environment:
       POSTGRES_PASSWORD: pass123
       POSTGRES_DB: petstore
-    ports:
-      - 5432:5432
     networks:
       - subnet1
   back-end:

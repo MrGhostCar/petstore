@@ -1,6 +1,5 @@
 package com.home.petstore.interceptor;
 
-import com.home.petstore.exception.ApiKeyException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
